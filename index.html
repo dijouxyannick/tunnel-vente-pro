@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FunnelPro - Créateur de Tunnels de Vente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1e1e1;
+        }
+
+        .logo h1 {
+            color: #1e3c72;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item .icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .content-section {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .client-card {
+            background: #f8f9fa;
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .client-card:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .client-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .client-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .template-card {
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .template-card:hover {
+            border-color: #1e3c72;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .template-preview {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .template-info {
+            padding: 20px;
+        }
+
+        .template-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1e3c72;
+        }
+
+        .template-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .funnel-builder {
+            display: flex;
+            gap: 20px;
+            min-height: 600px;
+        }
+
+        .builder-sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .builder-canvas {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px dashed #e1e1e1;
+            position: relative;
+        }
+
+        .element-category {
+            margin-bottom: 20px;
+        }
+
+        .element-category h4 {
+            margin-bottom: 10px;
+            color: #1e3c72;
+        }
+
+        .element-item {
+            padding: 10px;
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s ease;
+        }
+
+        .element-item:hover {
+            border-color: #1e3c72;
+            transform: translateX(5px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .analytics-chart {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #1e3c72;
+        }
+
+        .step-info h4 {
+            margin-bottom: 5px;
+            color: #1e3c72;
+        }
+
+        .step-stats {
+            text-align: right;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e1e1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            transition: width 0.3s ease;
+        }
+
+        .client-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 10px;
+            display: none;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>🚀 FunnelPro</h1>
+            <p>Créateur de Tunnels de Vente</p>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-section="dashboard">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="clients">
+                    <span class="icon">👥</span>
+                    Mes Clients
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="templates">
+                    <span class="icon">🎨</span>
+                    Templates
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="builder">
+                    <span class="icon">🔧</span>
+                    Constructeur
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="analytics">
+                    <span class="icon">📈</span>
+                    Analytics
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="settings">
+                    <span class="icon">⚙️</span>
+                    Paramètres
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 id="page-title">Dashboard</h1>
+            <div class="breadcrumb" id="breadcrumb">Accueil > Dashboard</div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3 id="total-clients">12</h3>
+                    <p>Clients Actifs</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="total-funnels">28</h3>
+                    <p>Tunnels Créés</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="total-revenue">€45,320</h3>
+                    <p>Revenus Générés</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="avg-conversion">8.7%</h3>
+                    <p>Conversion Moyenne</p>
+                </div>
+            </div>
+
+            <h3>Activité Récente</h3>
+            <div class="funnel-step">
+                <div class="step-info">
+                    <h4>Nouveau tunnel créé pour "Restaurant Le Gourmet"</h4>
+                    <p>Template: Landing Page Restaurant</p>
+                </div>
+                <div class="step-stats">
+                    <small>Il y a 2 heures</small>
+                </div>
+            </div>
+
+            <div class="funnel-step">
+                <div class="step-info">
+                    <h4>Tunnel "Coaching Fitness" - 15 nouvelles conversions</h4>
+                    <p>Revenus: +1,455€</p>
+                </div>
+                <div class="step-stats">
+                    <small>Aujourd'hui</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clients Section -->
+        <div id="clients" class="content-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Mes Clients</h2>
+                <button class="btn btn-primary" onclick="showModal('newClientModal')">+ Nouveau Client</button>
+            </div>
+
+            <div class="clients-grid" id="clientsGrid">
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-name">Restaurant Le Gourmet</div>
+                        <div class="client-status status-active">Actif</div>
+                    </div>
+                    <p><strong>Secteur:</strong> Restauration</p>
+                    <p><strong>Tunnel:</strong> Réservation en ligne</p>
+                    <p><strong>Conversions:</strong> 156 ce mois</p>
+                    <p><strong>Revenus:</strong> €12,480</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                    <div class="client-actions">
+                        <button class="btn btn-primary" onclick="editClient('gourmet')">Modifier</button>
+                        <button class="btn btn-secondary" onclick="viewAnalytics('gourmet')">Analytics</button>
+                        <button class="btn btn-success" onclick="previewFunnel('gourmet')">Prévisualiser</button>
+                    </div>
+                </div>
+
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-name">Coaching Fitness Pro</div>
+                        <div class="client-status status-active">Actif</div>
+                    </div>
+                    <p><strong>Secteur:</strong> Fitness & Bien-être</p>
+                    <p><strong>Tunnel:</strong> Vente de programmes</p>
+                    <p><strong>Conversions:</strong> 89 ce mois</p>
+                    <p><strong>Revenus:</strong> €8,900</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="client-actions">
+                        <button class="btn btn-primary" onclick="editClient('fitness')">Modifier</button>
+                        <button class="btn btn-secondary" onclick="viewAnalytics('fitness')">Analytics</button>
+                        <button class="btn btn-success" onclick="previewFunnel('fitness')">Prévisualiser</button>
+                    </div>
+                </div>
+
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-name">Formation Marketing Digital</div>
+                        <div class="client-status status-draft">En cours</div>
+                    </div>
+                    <p><strong>Secteur:</strong> Formation</p>
+                    <p><strong>Tunnel:</strong> Vente de formation</p>
+                    <p><strong>Conversions:</strong> 0 (pas encore lancé)</p>
+                    <p><strong>Revenus:</strong> €0</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="client-actions">
+                        <button class="btn btn-primary" onclick="editClient('marketing')">Continuer</button>
+                        <button class="btn btn-secondary" onclick="viewAnalytics('marketing')">Analytics</button>
+                        <button class="btn btn-success" onclick="previewFunnel('marketing')">Prévisualiser</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Templates Section -->
+        <div id="templates" class="content-section">
+            <h2>Templates de Tunnels</h2>
+            <p>Choisissez un template optimisé pour votre secteur d'activité</p>
+
+            <div class="template-grid">
+                <div class="template-card" onclick="selectTemplate('restaurant')">
+                    <div class="template-preview">🍽️ Restaurant</div>
+                    <div class="template-info">
+                        <div class="template-title">Landing Page Restaurant</div>
+                        <div class="template-description">Réservations en ligne, menu, témoignages clients</div>
+                        <div class="btn btn-primary">Utiliser ce template</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate('fitness')">
+                    <div class="template-preview">💪 Fitness</div>
+                    <div class="template-info">
+                        <div class="template-title">Coaching Sportif</div>
+                        <div class="template-description">Programmes personnalisés, transformation physique</div>
+                        <div class="btn btn-primary">Utiliser ce template</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate('ecommerce')">
+                    <div class="template-preview">🛍️ E-commerce</div>
+                    <div class="template-info">
+                        <div class="template-title">Boutique en ligne</div>
+                        <div class="template-description">Vente de produits, upsells, cross-sells</div>
+                        <div class="btn btn-primary">Utiliser ce template</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate('formation')">
+                    <div class="template-preview">🎓 Formation</div>
+                    <div class="template-info">
+                        <div class="template-title">Vente de Formation</div>
+                        <div class="template-description">Cours en ligne, webinaires, certifications</div>
+                        <div class="btn btn-primary">Utiliser ce template</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate('saas')">
+                    <div class="template-preview">💻 SaaS</div>
+                    <div class="template-info">
+                        <div class="template-title">Logiciel SaaS</div>
+                        <div class="template-description">Essai gratuit, abonnements, démonstrations</div>
+                        <div class="btn btn-primary">Utiliser ce template</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate('consulting')">
+                    <div class="template-preview">📊 Consulting</div>
+                    <div class="template-info">
+                        <div class="template-title">Services de Conseil</div>
+                        <div class="template-description">Audit gratuit, consultation, expertise</div>
+                        <div class="btn btn-primary">Utiliser ce template</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Builder Section -->
+        <div id="builder" class="content-section">
+            <h2>Constructeur de Tunnel</h2>
+            <p>Glissez-déposez les éléments pour créer votre tunnel personnalisé</p>
+
+            <div class="funnel-builder">
+                <div class="builder-sidebar">
+                    <div class="element-category">
+                        <h4>🎯 Landing Page</h4>
+                        <div class="element-item" draggable="true">Hero Section</div>
+                        <div class="element-item" draggable="true">Formulaire de capture</div>
+                        <div class="element-item" draggable="true">Témoignages</div>
+                        <div class="element-item" draggable="true">Garantie</div>
+                    </div>
+
+                    <div class="element-category">
+                        <h4>💳 Checkout</h4>
+                        <div class="element-item" draggable="true">Formulaire de paiement</div>
+                        <div class="element-item" draggable="true">Récapitulatif commande</div>
+                        <div class="element-item" draggable="true">Codes promo</div>
+                    </div>
+
+                    <div class="element-category">
+                        <h4>📈 Upsells</h4>
+                        <div class="element-item" draggable="true">Offre complémentaire</div>
+                        <div class="element-item" draggable="true">One-click upsell</div>
+                        <div class="element-item" draggable="true">Bundle products</div>
+                    </div>
+
+                    <div class="element-category">
+                        <h4>✅ Confirmation</h4>
+                        <div class="element-item" draggable="true">Page de remerciement</div>
+                        <div class="element-item" draggable="true">Instructions de livraison</div>
+                        <div class="element-item" draggable="true">Liens de téléchargement</div>
+                    </div>
+                </div>
+
+                <div class="builder-canvas" id="builderCanvas">
+                    <div style="text-align: center; color: #999; margin-top: 100px;">
+                        <h3>Votre tunnel apparaîtra ici</h3>
+                        <p>Glissez les éléments depuis la sidebar pour commencer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics" class="content-section">
+            <h2>Analytics Globales</h2>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>45,678</h3>
+                    <p>Visiteurs Total</p>
+                </div>
+                <div class="stat-card">
+                    <h3>3,456</h3>
+                    <p>Conversions Total</p>
+                </div>
+                <div class="stat-card">
+                    <h3>€127,890</h3>
+                    <p>Revenus Total</p>
+                </div>
+                <div class="stat-card">
+                    <h3>7.6%</h3>
+                    <p>Taux Global</p>
+                </div>
+            </div>
+
+            <div class="analytics-chart">
+                <h3>Performance par Client</h3>
+                <canvas id="clientChart" width="400" height="200"></canvas>
+            </div>
+
+            <h3>Top Performing Funnels</h3>
+            <div class="funnel-step">
+                <div class="step-info">
+                    <h4>Restaurant Le Gourmet - Landing Page</h4>
+                    <p>Taux de conversion: 12.3% | Revenus: €15,670</p>
+                </div>
+                <div class="step-stats">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 95%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="funnel-step">
+                <div class="step-info">
+                    <h4>Coaching Fitness - Programme Minceur</h4>
+                    <p>Taux de conversion: 8.9% | Revenus: €11,240</p>
+                </div>
+                <div class="step-stats">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings" class="content-section">
+            <h2>Paramètres</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nom de votre agence:</label>
+                    <input type="text" value="Digital Marketing Pro" id="agencyName">
+                </div>
+                <div class="form-group">
+                    <label>Email de contact:</label>
+                    <input type="email" value="contact@digitalpro.com" id="contactEmail">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Domaine personnalisé:</label>
+                <input type="text" placeholder="votreagence.com" id="customDomain">
+            </div>
+
+            <div class="form-group">
+                <label>Intégrations:</label>
+                <select id="integrations">
+                    <option>Stripe + PayPal</option>
+                    <option>Stripe seulement</option>
+                    <option>PayPal seulement</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Template d'email par défaut:</label>
+                <textarea rows="5" placeholder="Votre signature email...">
+Cordialement,
+L'équipe Digital Marketing Pro
+contact@digitalpro.com
++33 1 23 45 67 89
+                </textarea>
+            </div>
+
+            <button class="btn btn-primary">Sauvegarder les paramètres</button>
+        </div>
+    </div>
+
+    <!-- Modal Nouveau Client -->
+    <div id="newClientModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('newClientModal')">&times;</button>
+            <h2>Nouveau Client</h2>
+            
+            <div class="form-group">
+                <label>Nom du client:</label>
+                <input type="text" placeholder="Nom de l'entreprise" id="newClientName">
+            </div>
+
+            <div class="form-group">
+                <label>Secteur d'activité:</label>
+                <select id="newClientSector">
+                    <option>Restauration</option>
+                    <option>Fitness & Bien-être</option
